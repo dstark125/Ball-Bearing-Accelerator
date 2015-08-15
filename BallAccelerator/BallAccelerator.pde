@@ -3,7 +3,18 @@
 #include <pins.h>
 #include <variables.h>
 
-void setup() {                
+void setup() { 
+  //set up timer2 on pic32
+  CloseTimer2(); //Close the timer to reset it
+  OpenTimer2(T2_ON | T2_PS_1_1, timerCounter); //Open the timer at the 80Mhz/2105 frequency (and default multiplier)
+  
+  //Set up pwm pin 3 on pic32
+  CloseOC1(); //Close the PWM pin
+  OpenOC1(OC_ON | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, 0, 0); //Open the PWM pin with timer 2 as the source and 100% duty cycle
+  SetDCOC1PWM(timerCounter / 4); //Set the duty cycle of PWM pin to a quarter of the period
+
+  setFanPWM(75);
+
   pinMode(PIN_DETECTOR_OUT[0], INPUT);  //Set up pins to outputs or inputs
   pinMode(PIN_DETECTOR_OUT[1], INPUT);
   pinMode(PIN_DETECTOR_OUT[2], INPUT);
@@ -55,7 +66,7 @@ void setup() {
   digitalWrite(PIN_DETECTOR_STATUS[7], HIGH);  //Initialize pins that need to be initialized
   digitalWrite(PIN_DETECTOR_STATUS[8], HIGH);  //Initialize pins that need to be initialized
   digitalWrite(PIN_DETECTOR_STATUS[9], HIGH);  //Initialize pins that need to be initialized   
-    
+ 
    
   Serial.begin(9600);  
   delay(500);
@@ -170,6 +181,7 @@ void setup() {
   
   delay(1000); //Wait for PWM pins to start and ISRs to enter and everything to even out before we loop
   Serial.println("Ready");
+    
 }
 
 
@@ -375,9 +387,11 @@ void loop() {
 
 }
 
-void accelerate(startPin){
+//void accelerate(startPin){
   
-}
+//}
+
+
 
 
 void detectFalseBreak(){
@@ -454,6 +468,15 @@ void adjustDelay (int location){
 }
 
 
+void setFanPWM(int dutyCycle){
+  float setVal = float(dutyCycle);
+  
+  setVal /= 255;
+   
+  setVal *= timerCounter;
+    
+  SetDCOC1PWM(int(setVal)); 
+}
 
 
 /*

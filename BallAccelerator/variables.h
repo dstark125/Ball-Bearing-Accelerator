@@ -5,6 +5,7 @@
 
 unsigned long timeToReset = 0, timerInit = 0, timerDif = 0;  //Global variable declaration
 int count = 0, i = 0, j = 0, hashkey = 0, entrySpeed = 0, exitSpeed = 0, max1 = 5000, max2 = 5000;
+const int timerCounter = 3200; //32,000 should be 25khz
 
 int delay_table[4][125][3];
 unsigned long hold_table[2][5][2];
